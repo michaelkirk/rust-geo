@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Geometry",""]],"static":[["COORD_PRECISION",""]],"struct":[["Coordinate",""],["GeometryCollection",""],["LineString",""],["MultiLineString",""],["MultiPoint",""],["MultiPolygon",""],["Point",""],["Polygon",""]]});
