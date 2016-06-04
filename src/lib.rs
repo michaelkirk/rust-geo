@@ -8,6 +8,7 @@ mod traits;
 mod types;
 /// This module includes all the functions of geometric calculations
 pub mod algorithm;
+pub mod operation;
 
 #[cfg(test)]
 #[macro_use]
