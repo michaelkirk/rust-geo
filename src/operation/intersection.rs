@@ -1,7 +1,7 @@
-use types::{Point, LineString};
+use types::{Geometry, Point, LineString};
 
 pub trait HasIntersection<T> {
-    fn intersection(&self, rhs: &T) -> Option<Point>;
+    fn intersection(&self, rhs: &T) -> Option<Geometry>;
 }
 
 impl HasIntersection<Point> for Point {
@@ -10,20 +10,20 @@ impl HasIntersection<Point> for Point {
     /// # Examples
     ///
     /// ```
-    /// use geo::Point;
+    /// use geo::{Geometry, Point};
     /// use geo::operation::intersection::HasIntersection;
     ///
     /// let p1 = Point::new(1.0, 2.0);
     /// let p2 = Point::new(1.0, 2.0);
-    /// assert_eq!(Some(p1), p1.intersection(&p2));
+    /// assert_eq!(Some(Geometry::Point(p1)), p1.intersection(&p2));
     ///
     /// let p1 = Point::new(1.0, 2.0);
     /// let p2 = Point::new(2.0, 2.0);
     /// assert_eq!(None, p1.intersection(&p2));
     /// ```
-    fn intersection(&self, other_point: &Point) -> Option<Point> {
+    fn intersection(&self, other_point: &Point) -> Option<Geometry> {
         if self.eq(other_point) {
-            return Some(self.clone());
+            return Some(Geometry::Point(self.clone()));
         } else {
             return None;
         }
@@ -36,7 +36,7 @@ impl HasIntersection<Point> for LineString {
     /// # Examples
     ///
     /// ```
-    /// use geo::{Point, LineString};
+    /// use geo::{Geometry, Point, LineString};
     /// use geo::operation::intersection::HasIntersection;
     ///
     /// let line_start = Point::new(1.0, 1.0);
@@ -46,8 +46,8 @@ impl HasIntersection<Point> for LineString {
     ///   Point::new(3.0, 3.0)
     /// ]);
     ///
-    /// assert_eq!(Some(line_start), line_string.intersection(&line_start));
-    /// assert_eq!(Some(in_line), line_string.intersection(&in_line));
+    /// assert_eq!(Some(Geometry::Point(line_start)), line_string.intersection(&line_start));
+    /// assert_eq!(Some(Geometry::Point(in_line)), line_string.intersection(&in_line));
     ///
     /// let off_line = Point::new(1.0, 2.0);
     /// assert_eq!(None, line_string.intersection(&off_line));
@@ -62,7 +62,7 @@ impl HasIntersection<Point> for LineString {
     /// ]);
     /// assert_eq!(None, vertical_line_string.intersection(&past_line));
     /// ```
-    fn intersection(&self, point: &Point) -> Option<Point> {
+    fn intersection(&self, point: &Point) -> Option<Geometry> {
         for (start, end) in self.0.iter().zip(self.0[1..].iter()) {
             let dx_point = point.x() - start.x();
             let dy_point = point.y() - start.y();
@@ -91,9 +91,46 @@ impl HasIntersection<Point> for LineString {
             };
 
             if lower_bound <= coord(point) && coord(point) <= upper_bound {
-                return Some(point.clone());
+                return Some(Geometry::Point(point.clone()));
             }
         }
         return None;
+    }
+}
+
+impl HasIntersection<LineString> for LineString {
+    /// Returns any overlapping line segements and intersecting points
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use geo::{Geometry, Point, LineString};
+    /// use geo::operation::intersection::HasIntersection;
+    ///
+    /// let line_string = LineString(vec![
+    ///   Point::new(1.0, 1.0),
+    ///   Point::new(3.0, 3.0)
+    /// ]);
+    ///
+    /// let same_line_string = LineString(vec![
+    ///   Point::new(1.0, 1.0),
+    ///   Point::new(3.0, 3.0)
+    /// ]);
+    ///
+    /// let far_away_line_string = LineString(vec![
+    ///   Point::new(4.0, 4.0),
+    ///   Point::new(5.0, 5.0)
+    /// ]);
+    ///
+    /// assert_eq!(Some(Geometry::LineString(line_string.clone())), line_string.intersection(&same_line_string));
+    /// assert_eq!(None, line_string.intersection(&far_away_line_string));
+    /// ```
+    fn intersection(&self, other_line_string: &LineString) -> Option<Geometry> {
+        // TODO actually implement this method
+        if self.0.eq(&other_line_string.0) {
+            return Some(Geometry::LineString(self.clone()));
+        } else {
+            return None
+        }
     }
 }
