@@ -47,6 +47,8 @@ extern crate postgis;
 #[cfg(feature = "use-proj")]
 extern crate proj;
 extern crate rstar;
+#[macro_use]
+extern crate lazy_static;
 
 pub use crate::algorithm::*;
 #[allow(deprecated)]

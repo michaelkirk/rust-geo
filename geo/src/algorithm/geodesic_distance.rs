@@ -39,8 +39,12 @@ pub trait GeodesicDistance<T, Rhs = Self> {
     fn geodesic_distance(&self, rhs: &Rhs) -> T;
 }
 
+lazy_static! {
+    static ref WGS84_GEODESIC: Geodesic = Geodesic::wgs84();
+}
+
 impl GeodesicDistance<f64> for Point<f64> {
     fn geodesic_distance(&self, rhs: &Point<f64>) -> f64 {
-        Geodesic::wgs84().inverse(self.lat(), self.lng(), rhs.lat(), rhs.lng())
+        WGS84_GEODESIC.inverse(self.lat(), self.lng(), rhs.lat(), rhs.lng())
     }
 }
